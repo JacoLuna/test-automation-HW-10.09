@@ -5,11 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Calculate the number of unique words in the text (case-insensitive)
@@ -28,21 +26,39 @@ public class Main {
         Set<String> list = fileToSetList(content);
 
         do {
-            System.out.println("-0 exit \n-1 file data \n-2 find word");
-            ans = keyboard.nextInt();
-            if (ans == 1)
-                fileData(content);
-            else if (ans == 2){
-                findWord(content);
+            System.out.println("-0 exit \n-1 file data \n-2 find word \n-3 number of unique words \n-4 print file");
+            try {
+                ans = keyboard.nextInt();
+                switch (ans){
+                    case 1:
+                        fileData(content);
+                        break;
+                    case 2:
+                        findWord(content);
+                        break;
+                    case 3:
+                        System.out.println("amount of words " + list.size());
+                        break;
+                    case 4:
+                        printFile(path);
+                        break;
+                }
+            }catch (InputMismatchException e){
+                ans = -1;
+                keyboard.nextLine();
+                System.out.println("invalid input");
+            }catch (Exception e){
+                ans = -1;
+                keyboard.nextLine();
+                System.out.println(e.getMessage());
             }
-
         }while (ans != 0);
         System.out.println("Goodbye");
     }
     public static void findWord(String[] array){
         Scanner keyboard = new Scanner(System.in);
+        ArrayList<String> elements = new ArrayList<>();
         String ans;
-        int amount = 0;
         boolean valid = false;
 
         System.out.println("Type the word you are looking for");
@@ -52,10 +68,14 @@ public class Main {
                 valid = true;
                 for (String value: array){
                     if (StringUtils.contains(value,ans)){
-                        amount ++;
+                        elements.add(value);
                     }
                 }
-                System.out.println("\"" + ans + "\" founded " + amount + " times");
+                System.out.println("\"" + ans + "\" founded " + elements.size() + " times");
+                for (String value: elements){
+                    System.out.println(value);
+                }
+                System.out.println();
             }else {
                 System.out.println("The word must be longer than 1 character");
                 keyboard.nextLine();
@@ -75,7 +95,17 @@ public class Main {
         content = StringUtils.split(data, " ");
         return content;
     }
-
+    public static void printFile(String path){
+        String data;
+        try {
+            File file = FileUtils.getFile(path);
+            data = FileUtils.readFileToString(file, Charset.defaultCharset());
+        } catch(IOException e) {
+            data = "";
+            System.out.println(e.getMessage());
+        }
+        System.out.println(data);
+    }
     public static void fileData(String[] list){
         int letters = 0;
         for (String value: list){
