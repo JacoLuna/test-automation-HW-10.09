@@ -23,10 +23,10 @@ public class Main {
         Scanner keyboard = new Scanner(System.in);
         int ans;
         content = fileToArray(path);
-        Set<String> list = fileToSetList(content);
+        Set<String> list = collectionToSetList(List.of(content));
 
         do {
-            System.out.println("-0 exit \n-1 file data \n-2 find word \n-3 number of unique words \n-4 print file");
+            System.out.println("-0 exit\n-1 file data\n-2 find word\n-3 number of unique words\n-4 print file\n-5 add word");
             try {
                 ans = keyboard.nextInt();
                 switch (ans){
@@ -42,6 +42,11 @@ public class Main {
                     case 4:
                         printFile(path);
                         break;
+                    case 5:
+                        writeFile(path);
+                        content = fileToArray(path);
+                        list = collectionToSetList(List.of(content));
+                        break;
                 }
             }catch (InputMismatchException e){
                 ans = -1;
@@ -55,6 +60,8 @@ public class Main {
         }while (ans != 0);
         System.out.println("Goodbye");
     }
+
+    //items
     public static void findWord(String[] array){
         Scanner keyboard = new Scanner(System.in);
         ArrayList<String> elements = new ArrayList<>();
@@ -82,6 +89,15 @@ public class Main {
             }
         }while (!valid);
     }
+    public static void fileData(String[] list){
+        int letters = 0;
+        for (String value: list){
+            letters += value.length();
+        }
+        System.out.println("amount of words " + list.length);
+        System.out.println("amount of letters " + letters);
+    }
+    //Array conversion
     public static String[] fileToArray(String path){
         String data;
         String[] content;
@@ -95,6 +111,14 @@ public class Main {
         content = StringUtils.split(data, " ");
         return content;
     }
+    public static Set<String> collectionToSetList(Collection<String> content){
+        Set<String> list = new HashSet<>();
+        for (String value: content){;
+            list.add(StringUtils.toRootLowerCase(value));
+        }
+        return list;
+    }
+    //file functions
     public static void printFile(String path){
         String data;
         try {
@@ -106,21 +130,34 @@ public class Main {
         }
         System.out.println(data);
     }
-    public static void fileData(String[] list){
-        int letters = 0;
-        for (String value: list){
-            letters += value.length();
+    public static void writeFile(String path){
+        Scanner keyboard = new Scanner(System.in);
+        String ans, data;
+        boolean valid = false;
+        File file = null;
+        try {
+            file = FileUtils.getFile(path);
+            data = FileUtils.readFileToString(file, Charset.defaultCharset());
+        } catch(IOException e) {
+            data = "";
+            System.out.println(e.getMessage());
         }
-        System.out.println("amount of words " + list.length);
-        System.out.println("amount of letters " + letters);
+        System.out.println("write a word to add");
+        do {
+            ans = keyboard.next();
+            if (ans.length() > 1){
+                valid = true;
+                data += " " + ans;
+                try {
+                    FileUtils.write(file,data,Charset.defaultCharset());
+                    System.out.println("\"" + ans + "\" added");
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+            }else {
+                System.out.println("The word must be longer than 1 character");
+                keyboard.nextLine();
+            }
+        }while (!valid);
     }
-    public static Set<String> fileToSetList(String[] content){
-        Set<String> list = new HashSet<>();
-        int letters = 0;
-        for (String value: content){;
-            list.add(StringUtils.toRootLowerCase(value));
-        }
-        return list;
-    }
-
 }
